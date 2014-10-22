@@ -4,13 +4,13 @@ from nose.tools import assert_equal,assert_raises
 import numpy as np
 
 def test_negative_temperature_rejected():
-	assert_raises(ValueError, MonteCarlo, -1,0,[1])
+	assert_raises(ValueError, MonteCarlo, -1,0,np.array([1]))
 
 def test_zero_temperature_rejected():
-	assert_raises(ValueError, MonteCarlo, 1,0,[1])	
+	assert_raises(ValueError, MonteCarlo, 0,0,np.array([1]))	
 
 def test_negative_iterations_rejected():
-	assert_raises(ValueError, MonteCarlo, -1,0,[1])
+	assert_raises(ValueError, MonteCarlo, -1,0,np.array([1]))
 
 def test_no_particles_density_rejected():
 	zero_density = np.zeros(np.random.randint(1,100))

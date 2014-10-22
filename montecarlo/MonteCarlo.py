@@ -31,10 +31,15 @@ class MonteCarlo(object):
 			except TypeError:
 				raise(TypeError("You have given me an initial density with elements that do not support mathematical operations, this will not work"))
 
+		try:
+			if (initialDensity == 0).all():
+				raise(ValueError("Density has no particles"))
+		except AttributeError:
+			raise(TypeError("Density object is not a numpy array: doesn't support all()"))
+
 		self.temp = temperature
 		self.iterations = iterations
 		self.history = [initialDensity]
-		self.densitySize = len(initialDensity)
 
 	def energy(self, density, coeff=1.0):
 		total = 0.0
@@ -43,8 +48,29 @@ class MonteCarlo(object):
 		return total*(coeff/2.0)
 
 	def moveRandomParticle(self, density):
-		return density
+		if (density == 0).all():
+			raise(ValueError("Density has no particles"))
 
+		if not (density >= 0).all():
+			raise(ValueError("Density has an entry with negative particle number"))
+
+		density_c = copy.copy(density)
+		randomPosition = np.random.randint(0,len(density))
+		while density_c[randomPosition] == 0:
+			randomPosition = np.random.randint(0,len(density))
+
+		if np.random.randint(0,2) == 0:
+			# move left
+			if randomPosition > 0:
+				density_c[randomPosition]-=1
+				density_c[randomPosition-1]+=1
+		else:
+			# move right
+			if randomPosition < len(density)-1:
+				density_c[randomPosition]-=1
+				density_c[randomPosition+1]+=1
+		return density_c
+		
 	def performIteration(self):
 		pass
 
@@ -54,5 +80,6 @@ class MonteCarlo(object):
 
 
 if __name__=="__main__":
-	mc = MonteCarlo(10,10,np.array([0,0,0,0,0,0,0,1]))
-	mc.runSimulation()
+	mc = MonteCarlo(10,10,np.array([0,0,0,0,0,0,1]))
+	print mc.moveRandomParticle([0,0,0,1,0,0,0])
+	#mc.runSimulation()
