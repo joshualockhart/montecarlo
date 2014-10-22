@@ -46,7 +46,7 @@ class MonteCarlo(object):
 		return density
 
 	def performIteration(self):
-		return density
+		pass
 
 	def runSimulation(self):
 		for i in range(self.iterations):
