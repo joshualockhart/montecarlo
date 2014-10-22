@@ -47,6 +47,9 @@ class MonteCarlo(object):
 			total += i*(i-1)
 		return total*(coeff/2.0)
 
+	def getRandomParticleToMove(self, densityLen):
+		return np.random.randint(0,densityLen)
+
 	def moveRandomParticle(self, density):
 		if (density == 0).all():
 			raise(ValueError("Density has no particles"))
@@ -55,9 +58,9 @@ class MonteCarlo(object):
 			raise(ValueError("Density has an entry with negative particle number"))
 
 		density_c = copy.copy(density)
-		randomPosition = np.random.randint(0,len(density))
+		randomPosition = self.getRandomParticleToMove(len(density))
 		while density_c[randomPosition] == 0:
-			randomPosition = np.random.randint(0,len(density))
+			randomPosition = self.getRandomParticleToMove(len(density))
 
 		if np.random.randint(0,2) == 0:
 			# move left
@@ -71,15 +74,50 @@ class MonteCarlo(object):
 				density_c[randomPosition+1]+=1
 		return density_c
 		
+	def generateP1():
+		return np.random.uniform()
+
+	def calculateP0(self, energyDiff, temp):
+		return np.exp(-energyDiff/temp)
+
+	def checkIfAcceptMove(self,currentDensity, shiftedDensity):
+		currentEnergy = self.energy(currentDensity)
+		shiftedEnergy = self.energy(shiftedDensity)
+
+		energyDiff = shiftedEnergy-currentEnergy
+		if(energyDiff < 0):
+			return True
+		else:
+			p0 = self.calculateP0(energyDiff, self.temp)
+			p1 = self.generateP1()
+			if p0 > p1:
+				return True
+		return False
+
+
 	def performIteration(self):
-		pass
+		currentDensity = self.history[-1]
+		currentEnergy = self.energy(currentDensity)
+		shiftedDensity = self.moveRandomParticle(currentDensity)
+		shiftedEnergy = self.energy(shiftedDensity)
+
+		if checkIfAcceptMove(currentDensity,shiftedDensity) == True:
+			self.history.append(shiftedDensity)
+		else:
+			self.history.append(copy.copy(currentDensity))
+		
+		self.printHistory()
+		print ""
 
 	def runSimulation(self):
 		for i in range(self.iterations):
 			self.performIteration()
 
+	def printHistory(self):
+		for i in self.history:
+			print i
 
 if __name__=="__main__":
-	mc = MonteCarlo(10,10,np.array([0,0,0,0,0,0,1]))
-	print mc.moveRandomParticle([0,0,0,1,0,0,0])
-	#mc.runSimulation()
+	mc = MonteCarlo(0.5,10,np.array([3,0,3,8,3,2,0]))
+	mc.runSimulation()
+	mc.printHistory()
