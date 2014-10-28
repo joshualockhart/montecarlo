@@ -107,17 +107,3 @@ class MonteCarlo(object):
 	def printHistory(self):
 		for i in self.history:
 			print i
-
-
-if __name__=="__main__":
-	#i = np.append(np.append(np.zeros(100),np.random.random_integers(0,10,10)),np.zeros(100))
-	#i = np.append(np.append(np.zeros(100),np.zeros(10)+5),np.zeros(100))
-	#i = np.append(np.append(np.zeros(10),np.zeros(100)+5),np.zeros(10))
-	
-	i = np.zeros(100)
-	i[50] = 50
-	
-	mc = MonteCarlo(100,1000,i)
-	#mc = MonteCarlo(0.5,3000,np.random.random_integers(0,3,1000))
-	mc.runSimulation()
-	mc.plotHistory()
