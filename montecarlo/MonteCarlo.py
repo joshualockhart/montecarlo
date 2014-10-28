@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+from Energy import energy
 
 class MonteCarlo(object):
 	
@@ -41,12 +42,6 @@ class MonteCarlo(object):
 		self.iterations = iterations
 		self.history = [initialDensity]
 
-	def energy(self, density, coeff=1.0):
-		total = 0.0
-		for i in density:
-			total += i*(i-1)
-		return total*(coeff/2.0)
-
 	def getRandomParticleToMove(self, densityLen):
 		return np.random.randint(0,densityLen)
 
@@ -74,15 +69,15 @@ class MonteCarlo(object):
 				density_c[randomPosition+1]+=1
 		return density_c
 		
-	def generateP1():
+	def generateP1(self):
 		return np.random.uniform()
 
 	def calculateP0(self, energyDiff, temp):
 		return np.exp(-energyDiff/temp)
 
 	def checkIfAcceptMove(self,currentDensity, shiftedDensity):
-		currentEnergy = self.energy(currentDensity)
-		shiftedEnergy = self.energy(shiftedDensity)
+		currentEnergy = energy(currentDensity)
+		shiftedEnergy = energy(shiftedDensity)
 
 		energyDiff = shiftedEnergy-currentEnergy
 		if(energyDiff < 0):
@@ -94,30 +89,35 @@ class MonteCarlo(object):
 				return True
 		return False
 
-
 	def performIteration(self):
 		currentDensity = self.history[-1]
-		currentEnergy = self.energy(currentDensity)
+		currentEnergy = energy(currentDensity)
 		shiftedDensity = self.moveRandomParticle(currentDensity)
-		shiftedEnergy = self.energy(shiftedDensity)
+		shiftedEnergy = energy(shiftedDensity)
 
-		if checkIfAcceptMove(currentDensity,shiftedDensity) == True:
+		if self.checkIfAcceptMove(currentDensity,shiftedDensity) == True:
 			self.history.append(shiftedDensity)
 		else:
 			self.history.append(copy.copy(currentDensity))
 		
-		self.printHistory()
-		print ""
-
 	def runSimulation(self):
-		for i in range(self.iterations):
+		for i in range(self.iterations-1):
 			self.performIteration()
 
 	def printHistory(self):
 		for i in self.history:
 			print i
 
+
 if __name__=="__main__":
-	mc = MonteCarlo(0.5,10,np.array([3,0,3,8,3,2,0]))
+	#i = np.append(np.append(np.zeros(100),np.random.random_integers(0,10,10)),np.zeros(100))
+	#i = np.append(np.append(np.zeros(100),np.zeros(10)+5),np.zeros(100))
+	#i = np.append(np.append(np.zeros(10),np.zeros(100)+5),np.zeros(10))
+	
+	i = np.zeros(100)
+	i[50] = 50
+	
+	mc = MonteCarlo(100,1000,i)
+	#mc = MonteCarlo(0.5,3000,np.random.random_integers(0,3,1000))
 	mc.runSimulation()
-	mc.printHistory()
+	mc.plotHistory()
